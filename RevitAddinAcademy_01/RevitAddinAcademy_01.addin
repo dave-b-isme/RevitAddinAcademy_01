@@ -17,4 +17,13 @@
     <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
   </AddIn>
+	<AddIn Type="Command">
+		<Text>Command Session01Challenge</Text>
+		<Description>FizzBuzz</Description>
+		<Assembly>RevitAddinAcademy_01.dll</Assembly>
+		<FullClassName>RevitAddinAcademy_01.Command01Challenge</FullClassName>
+		<ClientId>5986075B-824E-4C1F-B058-79CDF5664F87</ClientId>
+		<VendorId>com.typepad.thebuildingcoder</VendorId>
+		<VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+	</AddIn>
 </RevitAddIns>

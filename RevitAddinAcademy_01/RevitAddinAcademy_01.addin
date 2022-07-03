@@ -1,22 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
-  <AddIn Type="Command">
-    <Text>Command RevitAddinAcademy_01</Text>
-    <Description>Some description for RevitAddinAcademy_01</Description>
-    <Assembly>RevitAddinAcademy_01.dll</Assembly>
-    <FullClassName>RevitAddinAcademy_01.Command</FullClassName>
-    <ClientId>4C14C6E4-98F8-4AF5-B866-33017E0EBB13</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
-  </AddIn>
-  <AddIn Type="Application">
-    <Name>Application RevitAddinAcademy_01</Name>
-    <Assembly>RevitAddinAcademy_01.dll</Assembly>
-    <FullClassName>RevitAddinAcademy_01.App</FullClassName>
-    <ClientId>5EBC9113-38D4-4F84-84AC-E59FDD2382E6</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
-  </AddIn>
+    <AddIn Type="Command">
+        <Text>Command RevitAddinAcademy_01</Text>
+        <Description>Some description for RevitAddinAcademy_01</Description>
+        <Assembly>RevitAddinAcademy_01.dll</Assembly>
+        <FullClassName>RevitAddinAcademy_01.Command</FullClassName>
+        <ClientId>4C14C6E4-98F8-4AF5-B866-33017E0EBB13</ClientId>
+        <VendorId>com.typepad.thebuildingcoder</VendorId>
+        <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+    </AddIn>
+	<AddIn Type="Command">
+		<Text>Command Session01</Text>
+		<Description>Testing for Session01</Description>
+		<Assembly>RevitAddinAcademy_01.dll</Assembly>
+		<FullClassName>RevitAddinAcademy_01.Session01</FullClassName>
+		<ClientId>129B3087-B15E-4BE2-A9FE-42C84E29CDFB</ClientId>
+		<VendorId>com.typepad.thebuildingcoder</VendorId>
+		<VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+	</AddIn>
 	<AddIn Type="Command">
 		<Text>Command Session01Challenge</Text>
 		<Description>FizzBuzz</Description>
@@ -26,4 +27,12 @@
 		<VendorId>com.typepad.thebuildingcoder</VendorId>
 		<VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
 	</AddIn>
+  <AddIn Type="Application">
+    <Name>Application RevitAddinAcademy_01</Name>
+    <Assembly>RevitAddinAcademy_01.dll</Assembly>
+    <FullClassName>RevitAddinAcademy_01.App</FullClassName>
+    <ClientId>5EBC9113-38D4-4F84-84AC-E59FDD2382E6</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
 </RevitAddIns>

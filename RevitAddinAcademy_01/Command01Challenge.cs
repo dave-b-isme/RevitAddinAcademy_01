@@ -25,10 +25,68 @@ namespace RevitAddinAcademy_01
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            //Comment Line
-            TaskDialog.Show("Revit Add-in Academy", "This is just a command add-in dialog box");
+            //string text = "Revit Add-in Academy";
+            //string fileName = doc.PathName;
+
+            double offset = 0.05;
+            double offsetCalc = offset * doc.ActiveView.Scale;
+
+            XYZ curPoint = new XYZ(0, 0, 0);
+            XYZ offsetPoint = new XYZ(0, offsetCalc, 0);
+
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            collector.OfClass(typeof(TextNoteType));
+
+            Transaction t = new Transaction(doc, "Create Text Note");
+            t.Start();
+
+            int range = 100;
+            for (int i = 1; i <= range; i++)
+            {
+                
+                if(i % 3 == 0 & i % 5 == 0)
+                {
+                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "FIZZBUZZ", collector.FirstElementId());
+                    
+                }
+                else if(i % 3 == 0)
+                {
+                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "FIZZ", collector.FirstElementId());
+                    
+                }
+                else if(i % 5 == 0)
+                {
+                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "BUZZ", collector.FirstElementId());
+                    
+                }
+                else
+                {
+                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "Number" + i.ToString(), collector.FirstElementId());
+                    
+                }
+                    
+
+
+                
+                curPoint = curPoint.Subtract(offsetPoint);
+
+            }
+
+            t.Commit();
+            t.Dispose();
+
 
             return Result.Succeeded;
+        }
+
+        internal double Method01(double a, double b)
+        {
+            double c = a + b;
+
+            Debug.Print("Got here: " + c.ToString());
+
+            return c;
+
         }
     }
 }

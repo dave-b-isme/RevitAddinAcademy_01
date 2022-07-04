@@ -34,6 +34,8 @@ namespace RevitAddinAcademy_01
             XYZ curPoint = new XYZ(0, 0, 0);
             XYZ offsetPoint = new XYZ(0, offsetCalc, 0);
 
+            string curNote = "curNote";
+
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             collector.OfClass(typeof(TextNoteType));
 
@@ -43,34 +45,41 @@ namespace RevitAddinAcademy_01
             int range = 100;
             for (int i = 1; i <= range; i++)
             {
-                
-                if(i % 3 == 0 & i % 5 == 0)
-                {
-                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "FIZZBUZZ", collector.FirstElementId());
-                    
-                }
-                else if(i % 3 == 0)
-                {
-                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "FIZZ", collector.FirstElementId());
-                    
-                }
-                else if(i % 5 == 0)
-                {
-                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "BUZZ", collector.FirstElementId());
-                    
-                }
-                else
-                {
-                    TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "Number" + i.ToString(), collector.FirstElementId());
-                    
-                }
-                    
-
-
-                
+                TextNote printNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, fizzBuzz(i), collector.FirstElementId());
                 curPoint = curPoint.Subtract(offsetPoint);
-
             }
+
+            //int range = 100;
+            //for (int i = 1; i <= range; i++)
+            //{
+                
+            //    if(i % 3 == 0 & i % 5 == 0)
+            //    {
+            //        TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "FIZZBUZZ", collector.FirstElementId());
+                    
+            //    }
+            //    else if(i % 3 == 0)
+            //    {
+            //        TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "FIZZ", collector.FirstElementId());
+                    
+            //    }
+            //    else if(i % 5 == 0)
+            //    {
+            //        TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "BUZZ", collector.FirstElementId());
+                    
+            //    }
+            //    else
+            //    {
+            //        TextNote curNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, "Number" + i.ToString(), collector.FirstElementId());
+                    
+            //    }
+                    
+
+
+                
+            //    curPoint = curPoint.Subtract(offsetPoint);
+
+            //}
 
             t.Commit();
             t.Dispose();
@@ -79,14 +88,42 @@ namespace RevitAddinAcademy_01
             return Result.Succeeded;
         }
 
-        internal double Method01(double a, double b)
+        //internal double Method01(double a, double b)
+        //{
+        //    double c = a + b;
+
+        //    Debug.Print("Got here: " + c.ToString());
+
+        //    return c;
+        //}
+
+        internal string fizzBuzz(int i)
         {
-            double c = a + b;
+            
+            if (i % 3 == 0 && i % 5 == 0)
+            {
+                string curNote = "FIZZBUZZ";
+            }
+            else if (i % 3 == 0 || i % 5 == 0)
+            {
+                if (i % 3 == 0)
+                {
+                    string curNote = "FIZZ";
+                }
+                else
+                {
+                    string curNote = "BUZZ";
+                }
+            }
+            else
+            {
+                string curNote = "";
+            }
 
-            Debug.Print("Got here: " + c.ToString());
-
-            return c;
+            return curNote;
+            
 
         }
+
     }
 }

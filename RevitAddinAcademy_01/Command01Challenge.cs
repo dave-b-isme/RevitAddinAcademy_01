@@ -28,17 +28,27 @@ namespace RevitAddinAcademy_01
             //string text = "Revit Add-in Academy";
             //string fileName = doc.PathName;
 
+            
+            XYZ curPoint = new XYZ(0, 0, 0);
             double offset = 0.05;
             double offsetCalc = offset * doc.ActiveView.Scale;
-
-            XYZ curPoint = new XYZ(0, 0, 0);
             XYZ offsetPoint = new XYZ(0, offsetCalc, 0);
 
             
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             collector.OfClass(typeof(TextNoteType));
 
-            Transaction t = new Transaction(doc, "Create Text Note");
+            //using(Transaction t = new Transaction(doc))
+            //
+            //t.Start("FizzBuzz");
+            //
+            //{
+            //    //Code
+            //}
+
+            //t.Commit()
+
+            Transaction t = new Transaction(doc, "FizzBuzz");
             t.Start();
             
             int range = 100;
@@ -58,6 +68,8 @@ namespace RevitAddinAcademy_01
                     curNote = i.ToString();
                 }
 
+                //Debug.Print(curNote);
+
                 //TextNote printNote = TextNote.Create(doc, doc.ActiveView.Id, curPoint, curNote, collector.FirstElementId());
                 TextNote.Create(doc, doc.ActiveView.Id, curPoint, curNote, collector.FirstElementId());
                 curPoint = curPoint.Subtract(offsetPoint);
@@ -72,7 +84,10 @@ namespace RevitAddinAcademy_01
             return Result.Succeeded;
         }
 
-
+        //internal void CreateTextNote(Document doc, string text, XYZ insPoint, ElementId id)
+        //{
+        //    TextNote.Create(doc, doc.Activeview.Id, curPoint, curNote, collector)
+        //}
 
     }
 }

@@ -10,7 +10,7 @@
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
   </AddIn>
 	<AddIn Type="Command">
-		<Text>Challenge 02</Text>
+		<Text>Project Setup</Text>
 		<Description>Description for RevitAddinAcademy_01</Description>
 		<Assembly>RevitAddinAcademy_01.dll</Assembly>
 		<FullClassName>RevitAddinAcademy_01.cmdProjectSetup</FullClassName>

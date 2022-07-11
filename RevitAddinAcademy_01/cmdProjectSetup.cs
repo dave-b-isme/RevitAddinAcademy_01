@@ -39,11 +39,21 @@ namespace RevitAddinAcademy_01
             Excel.Range excelRng2 = excelWs2.UsedRange;
 
             //Select all cells in use            
-            List<string[]> dataList = new List<string[]>();
-            int rowCount = excelRng1.Rows.Count;
+            List<string[]> levelList = new List<string[]>();
+            List<string[]> sheetList = new List<string[]>();
+            int rowCount1 = excelRng1.Rows.Count;
+            int rowCount2 = excelRng2.Rows.Count;
 
+            // Get Sheet Type (first one)
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            collector.OfCategory(BuiltInCategory.OST_TitleBlocks);
+            collector.WhereElementIsElementType();
+            var tbType = collector.FirstElementId();
+
+            // Should make this a method and instance the columns maybe
+            // Or just derive sheet names and numbers from Level Data
             //Import excel LEVEL data as 2D array
-            for(int i = 1; i <= rowCount; i++)
+            for (int i = 1; i <= rowCount1; i++)
             {
                 Excel.Range cell1 = excelWs1.Cells[i, 1];
                 Excel.Range cell2 = excelWs1.Cells[i, 2];
@@ -55,25 +65,68 @@ namespace RevitAddinAcademy_01
                 dataArray[0] = data1;
                 dataArray[1] = data2;
 
-                dataList.Add(dataArray);                
+                levelList.Add(dataArray);                
+
+            }
+
+            for (int i = 1; i <= rowCount2; i++)
+            {
+                Excel.Range cell1 = excelWs2.Cells[i, 1];
+                Excel.Range cell2 = excelWs2.Cells[i, 2];
+
+                string data1 = cell1.Value.ToString();
+                string data2 = cell2.Value.ToString();
+
+                string[] dataArray = new string[2];
+                dataArray[0] = data1;
+                dataArray[1] = data2;
+
+                sheetList.Add(dataArray);
 
             }
 
             //Remove Headers
-            dataList.RemoveAt(0);
+            levelList.RemoveAt(0);
+            sheetList.RemoveAt(0);
 
-            //Create Level and Sheet from data
+            //Create Level from data
             using (Transaction t = new Transaction(doc))
             {
                 t.Start("Create Levels");
 
                 //Level curLevel = Level.Create(doc, 100);
-                foreach (string[] levelHeight in dataList)
+                foreach (string[] levelData in levelList)
                 {
-                    string levelName = levelHeight[0];
-                    string levelFeetstr = levelHeight[1];
+                    string levelName = levelData[0];
+                    string levelFeetstr = levelData[1];
                     double levelFeet = Double.Parse(levelFeetstr);
                     Level curLevel = Level.Create(doc, levelFeet);
+                    // Need to Rename existing Levels too                    
+                    string tempName = "Element " + curLevel.Id.ToString();
+                    curLevel.Name = tempName;
+                    curLevel.Name = levelName;
+
+                }
+
+                t.Commit();
+
+            }
+
+            //Create Sheet from data            
+            using (Transaction t = new Transaction(doc))
+            {
+                t.Start("Create Sheets");
+
+                foreach (string[] sheetData in sheetList)
+                {
+                    string sheetNum = sheetData[0];
+                    string sheetName = sheetData[1];
+                    ViewSheet curSheet = ViewSheet.Create(doc, tbType);
+                    curSheet.SheetNumber = sheetNum;
+                    curSheet.Name = sheetName;
+
+                    // Need to check for existing sheets
+
 
                 }
 

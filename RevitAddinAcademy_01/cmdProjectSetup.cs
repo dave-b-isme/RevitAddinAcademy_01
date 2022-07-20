@@ -46,9 +46,32 @@ namespace RevitAddinAcademy_01
             // Get the excel data (by name) with method - GetExcelData ( filepath, sheetnames ) Levels Sheets            
             List<string[]> levelData = GetExcelData(filePath, "Levels");
             int levelCount = levelData.Count;
+            var levelArray = levelData.ToArray();
             List<string[]> sheetData = GetExcelData(filePath, "Sheets");
             int sheetCount = sheetData.Count;
+            var sheetArray = sheetData.ToArray();
             int levelCounter = 0;
+
+            using (Transaction t1 = new Transaction(doc))
+            {
+                foreach( string[] level in levelData)
+                {
+                    try
+                    {
+                        Level curLevel = Level.Create(doc, Double.Parse(level[1]));
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Print(ex.Message);
+                    }
+
+                }
+
+
+                t1.Commit();
+            }
 
             // Create Levels, Floor Plan and RCP Views for Each Level
             // TRANSACTION
@@ -110,8 +133,22 @@ namespace RevitAddinAcademy_01
         //STRUCTS
         //
         // LEVEL DATA
+        internal struct LevelStruct
+        {
+            public string levelName;
+            public double levelElev;  
+            
+            public LevelStruct(string lname, double lelev)
+            {
+                levelName = lname;
+                levelElev = lelev;
+            }
 
-        
+        }
+
+        // SHEET DATA
+
+
         // METHODS
         //
         // GET TITLE BLOCK BY NAME
@@ -162,6 +199,38 @@ namespace RevitAddinAcademy_01
         // CLOSE EXCEL
         //
         // Worksheet Name, string array
+        // Try 2D array instead of List?
+        // Try Struct instead of List?
+
+        
+        internal List<LevelStruct> GetLevelData(string excelFile, string wsName)
+        {
+            Excel.Application excelApp = new Excel.Application();
+            Excel.Workbook excelWB = excelApp.Workbooks.Open(excelFile);
+            Excel.Worksheet excelWS = excelWB.Worksheets[wsName];
+            Excel.Range excelRng = excelWS.UsedRange;
+
+            int colCount = excelRng.Columns.Count;
+            int rowCount = excelRng.Rows.Count;
+
+            List<string[]> dataList = new List<string[]>();
+            string[] dataArray = new string[colCount];
+
+            for (int r = 2; r<=rowCount; r++)
+            {
+                for (int c = 1; c<= colCount; c++)
+                {
+                    Excel.Range cell = excelWS.Cells[r+1, c+1];
+                    dataArray[c - 1] = cell.Value.ToString();
+                }
+
+                dataList.Add(dataArray);
+
+            }
+
+
+            return dataList;
+        }
 
         internal List<string[]> GetExcelData(string excelFile, string wsName)
         {
@@ -183,9 +252,7 @@ namespace RevitAddinAcademy_01
                 for (int c = 1; c <= colCount; c++)
                 {
                     Excel.Range cell = excelWS.Cells[r, c];
-                    string data = cell.Value.ToString();
-
-                    dataArray[c-1] = data;
+                    dataArray[c-1] = cell.Value.ToString();
 
                 }
 

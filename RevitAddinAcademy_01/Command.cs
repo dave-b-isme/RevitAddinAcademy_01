@@ -183,10 +183,10 @@ namespace RevitAddinAcademy_01
                 Value2 = value2;
             }
 
-            //public double addNumber()
-            //{
-            //    return Value + Value2;
-            //}
+            public double addNumber()
+            {
+                return Value + Value2;
+            }
 
         }
     }

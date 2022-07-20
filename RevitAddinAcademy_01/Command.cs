@@ -148,6 +148,8 @@ namespace RevitAddinAcademy_01
             return Result.Succeeded;
         }
 
+
+
         // METHOD Get View By Name
         internal View GetViewByName(Document doc, string viewName)
         {
@@ -181,10 +183,10 @@ namespace RevitAddinAcademy_01
                 Value2 = value2;
             }
 
-            //public double addNumber()
-            //{
-            //    return Value + Value2;
-            //}
+            public double addNumber()
+            {
+                return Value + Value2;
+            }
 
         }
     }

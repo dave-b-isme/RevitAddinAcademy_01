@@ -58,7 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
-    <Compile Include="cmdProjectSetupReview.cs" />
     <Compile Include="cmdProjectSetup.cs" />
     <Compile Include="Template_App.cs" />
     <Compile Include="Command.cs" />

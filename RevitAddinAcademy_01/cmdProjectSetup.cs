@@ -34,119 +34,203 @@ namespace RevitAddinAcademy_01
             Forms.OpenFileDialog dialog = new Forms.OpenFileDialog();
             dialog.InitialDirectory = @"C:\Users\David\Documents";
             dialog.Multiselect = false;
-            dialog.Filter = "Excel Files | *.xls; *.xlsx";
-            string filePath = "";
+            dialog.Filter = "Excel Files | *.xls; *.xlsx; *.xlsm | All Files | *.*";            
             
-
-            if(dialog.ShowDialog() == Forms.DialogResult.OK)
+            //GATE Break code with user input
+            if(dialog.ShowDialog() != Forms.DialogResult.OK)
             {
-                filePath = dialog.FileName;
+                TaskDialog.Show("Error", "Please select an Excel file");
+                return Result.Failed;                
             }
+            
+            string filePath = dialog.FileName;
 
-            // Get the excel data (by name) with method - GetExcelData ( filepath, sheetnames ) Levels Sheets            
-            List<string[]> levelData = GetExcelData(filePath, "Levels");
-            int levelCount = levelData.Count;
-            var levelArray = levelData.ToArray();
-            List<string[]> sheetData = GetExcelData(filePath, "Sheets");
-            int sheetCount = sheetData.Count;
-            var sheetArray = sheetData.ToArray();
-            int levelCounter = 0;
+            //
+            //REVIEW Use Struct with Method to get Level & Sheet Data
+            //
+            List<string[]> levelArrays = GetExcelData(filePath, "Levels");
+            List<LevelStruct> levelData = GetLevelData(levelArrays);
+            List<string[]> sheetArray = GetExcelData(filePath, "Sheets");
+            List<SheetStruct> sheetData = GetSheetData(sheetArray);
 
-            using (Transaction t1 = new Transaction(doc))
+            // Getting View Types...
+            FilteredElementCollector collector1 = new FilteredElementCollector(doc);
+            collector1.OfClass(typeof(ViewFamilyType));
+            ViewFamilyType curVFT = null;
+            ViewFamilyType curRCPVFT = null;
+
+            foreach (ViewFamilyType curElem in collector1)
             {
-                foreach( string[] level in levelData)
+                if (curElem.ViewFamily == ViewFamily.FloorPlan)
                 {
-                    try
-                    {
-                        Level curLevel = Level.Create(doc, Double.Parse(level[1]));
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.Print(ex.Message);
-                    }
-
+                    curVFT = curElem;
                 }
 
+                else
+                    if (curElem.ViewFamily == ViewFamily.CeilingPlan)
+                {
+                    curRCPVFT = curElem;
+                }
 
-                t1.Commit();
             }
 
+
+            // REVIEW Challenge attempt
             // Create Levels, Floor Plan and RCP Views for Each Level
             // TRANSACTION
+
+            int levelCounter = 0;
             using (Transaction t = new Transaction(doc))
             {
-                foreach (string[] levelInst in levelData)
+                t.Start("Making Plans");
+                
+                foreach (LevelStruct level in levelData)
                 {
+                    Level curLevel = null;
+                    curLevel = Level.Create(doc, (level.levelElev));
+                    curLevel.Name = level.levelName + curLevel.Id.ToString();
+
                     try
                     {
-                        Level curLevel = Level.Create(doc, Double.Parse(levelInst[1]));
-                        curLevel.Name = "Element " + curLevel.Id.ToString();
-                        curLevel.Name = levelInst[0];
+                        curLevel.Name = level.levelName;
                         levelCounter++;
                     }
                     catch (Exception ex)
                     {
                         Debug.Print(ex.Message);
-                        TaskDialog.Show("Revit Addin Academy", "Couldn't Create Level" + levelInst[0]);
+                        TaskDialog.Show("Revit Addin Academy", "Level" + level.levelName + "Has been renamed to " + level.levelName + curLevel.Id.ToString());
+                        //levelData.Remove(level);
                     }
 
+                    ViewPlan curPlan = ViewPlan.Create(doc, curVFT.Id, curLevel.Id);
+                    ViewPlan curRCP = ViewPlan.Create(doc, curRCPVFT.Id, curLevel.Id);
+                    curRCP.Name = curRCP.Name + " RCP";
 
                 }
 
                 t.Commit();
             }
-            
 
-
-
-            //Create Sheets and add Views to each sheet
-            // TRANSACTION
-
-
-            
-            //string tbName != "E1 30 x 42 Horizontal"; ??? 
+            // REVIEW Challenge attempt
+            // Create Sheets
             string tbString = "E1 30x42 Horizontal";
 
-            Element tbElem = GetTBbyName(doc, tbString);
-
-            if (tbElem == null)
+            using (Transaction t2 = new Transaction(doc))
             {
-                TaskDialog.Show("Revit Addin Academy", "I couldn't find any");
+                t2.Start("Making Sheets");
+
+                Element tbType = GetTBbyName(doc, tbString);
+
+                if(tbType == null)
+                {
+                    TaskDialog.Show("Error", "Oops can't find Title Block");
+                    return Result.Failed;
+                }
+
+                foreach(SheetStruct sheet in sheetData)
+                {
+                    ViewSheet newSheet = null;
+                    
+                    try
+                    {
+                        newSheet = ViewSheet.Create(doc, tbType.Id);
+                        newSheet.Name = sheet.sheetName;
+                        newSheet.SheetNumber = sheet.sheetNumber;
+                        SetParameter(newSheet, "Drawn By", sheet.drawnBy);
+                        SetParameter(newSheet, "Checked By", sheet.checkBy);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Print(ex.Message);
+                    }
+
+                    try
+                    {
+                        Viewport newViewport = Viewport.Create(doc, newSheet.Id, GetViewByName(doc, sheet.sheetView), new XYZ(0, 0, 0));
+                    }
+                    catch(Exception ex2)
+                    {
+                        Debug.Print(ex2.Message);
+                    }
+                    
+                    
+
+
+                }
+
+
+
+
+                t2.Commit();
             }
-            if (tbElem.Name == tbString)
-            {
-                TaskDialog.Show("Revit Addin Academy", "I found " + tbElem.Name);
-            }            
-            else
-            {
-                TaskDialog.Show("Revit Addin Academy", "Can't find it, I'm using " + tbElem.Name + " instead");
-            }
 
-
+            //// First Challenge attempt
+            //// Get the excel data (by name) with method - GetExcelData ( filepath, sheetnames ) Levels Sheets            
+            //List<string[]> lvlData = GetExcelData(filePath, "Levels");
+            //int levelCount = lvlData.Count;
+            //var levelArray = lvlData.ToArray();
+            //List<string[]> shtData = GetExcelData(filePath, "Sheets");
+            //int sheetCount = shtData.Count;
+            //var sheetArray = shtData.ToArray();
+            //int levelCounter = 0;
 
 
             return Result.Succeeded;
         }
 
+        private ElementId GetViewByName(Document doc, string sheetView)
+        {
+            FilteredElementCollector collector3 = new FilteredElementCollector(doc);
+            collector3.OfCategory(BuiltInCategory.OST_Views);
+
+            foreach(View v in collector3)
+            {
+                if(v.Name == sheetView)
+                {
+                    return v.Id;
+                }
+
+            }
+
+            return null;
+        }
+
         //STRUCTS
         //
         // LEVEL DATA
-        internal struct LevelStruct
+        private struct LevelStruct
         {
             public string levelName;
-            public double levelElev;  
-            
-            public LevelStruct(string lname, double lelev)
+            public double levelElev;
+
+            public LevelStruct(string name, double elev)
             {
-                levelName = lname;
-                levelElev = lelev;
+                levelName = name;
+                levelElev = elev;
             }
 
         }
 
+        //
         // SHEET DATA
+
+        private struct SheetStruct
+        {
+            public string sheetNumber;
+            public string sheetName;
+            public string sheetView;
+            public string drawnBy;
+            public string checkBy;
+
+            public SheetStruct(string number, string name, string view, string db, string cb)
+            {
+                sheetNumber = number;
+                sheetName = name;
+                sheetView = view;
+                drawnBy = db;
+                checkBy = cb;
+            }
+        }
 
 
         // METHODS
@@ -203,35 +287,11 @@ namespace RevitAddinAcademy_01
         // Try Struct instead of List?
 
         
-        internal List<LevelStruct> GetLevelData(string excelFile, string wsName)
-        {
-            Excel.Application excelApp = new Excel.Application();
-            Excel.Workbook excelWB = excelApp.Workbooks.Open(excelFile);
-            Excel.Worksheet excelWS = excelWB.Worksheets[wsName];
-            Excel.Range excelRng = excelWS.UsedRange;
-
-            int colCount = excelRng.Columns.Count;
-            int rowCount = excelRng.Rows.Count;
-
-            List<string[]> dataList = new List<string[]>();
-            string[] dataArray = new string[colCount];
-
-            for (int r = 2; r<=rowCount; r++)
-            {
-                for (int c = 1; c<= colCount; c++)
-                {
-                    Excel.Range cell = excelWS.Cells[r+1, c+1];
-                    dataArray[c - 1] = cell.Value.ToString();
-                }
-
-                dataList.Add(dataArray);
-
-            }
-
-
-            return dataList;
-        }
-
+        // METHOD
+        // Get worksheet by name
+        // Trying one method to get worksheet of any size to use for both sheets and levels
+        // ADD use "Sheet1" if Name Not Found
+        // ADD try catch if no sheets found
         internal List<string[]> GetExcelData(string excelFile, string wsName)
         {
             Excel.Application excelApp = new Excel.Application();
@@ -242,13 +302,13 @@ namespace RevitAddinAcademy_01
             int colCount = excelRng.Columns.Count;
             int rowCount = excelRng.Rows.Count;
 
+            
             List<string[]> dataList = new List<string[]>();
-            string[] dataArray = new string[colCount];
 
             for (int r = 2; r <= rowCount; r++)
             {
-                //string[] colArray = new string[rowCount];
-                                
+                string[] dataArray = new string[colCount];
+
                 for (int c = 1; c <= colCount; c++)
                 {
                     Excel.Range cell = excelWS.Cells[r, c];
@@ -266,6 +326,37 @@ namespace RevitAddinAcademy_01
             return dataList;
         }
 
+        // Do I need to loop through or is there a way to convert List<string[]> to LevelStruct
+        // Maybe create LevelStruct as a List<string[]>??
+        // Maybe collect data into LevelStruct XXXX no, would need to define # of columns in Struct
+        private List<LevelStruct> GetLevelData(List<string[]> curData)
+        {
+            List<LevelStruct> returnList = new List<LevelStruct>();
+
+            //foreach(LevelStruct Data in curData)
+            foreach (string[] data in curData)
+            {
+                //LevelStruct curLevel = new LevelStruct(data);
+                //It won't let me plug array into Struct so I index it 
+                LevelStruct curLevel = new LevelStruct(data[0], Double.Parse(data[1]));
+                returnList.Add(curLevel);
+            }
+
+            return returnList;
+        }
+                
+        private List<SheetStruct> GetSheetData(List<string[]> curData)
+        {
+            List<SheetStruct> returnList = new List<SheetStruct>();
+
+            foreach (string[] data in curData)
+            {
+                SheetStruct curSheet = new SheetStruct(data[0], data[1], data[2], data[3], data[4]);
+                returnList.Add(curSheet);
+            }
+
+            return returnList;
+        }
 
     }
 }

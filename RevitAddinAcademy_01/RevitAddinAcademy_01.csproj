@@ -60,7 +60,7 @@
     <Compile Include="App.cs" />
     <Compile Include="cmdProjectSetup.cs" />
     <Compile Include="Template_App.cs" />
-    <Compile Include="cmdMessage.cs" />
+    <Compile Include="cmdElementsFromLines.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Template_Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

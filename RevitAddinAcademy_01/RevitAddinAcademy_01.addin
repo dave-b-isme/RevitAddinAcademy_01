@@ -4,7 +4,7 @@
     <Text>Hidden Message</Text>
     <Description>Some description for RevitAddinAcademy_01</Description>
     <Assembly>RevitAddinAcademy_01.dll</Assembly>
-    <FullClassName>RevitAddinAcademy_01.cmdMessage</FullClassName>
+    <FullClassName>RevitAddinAcademy_01.cmdElementsFromLines</FullClassName>
     <ClientId>8295318C-D026-4D19-ABA9-0638D40A6BC9</ClientId>
     <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>

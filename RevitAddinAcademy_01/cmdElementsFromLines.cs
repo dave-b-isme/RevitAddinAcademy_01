@@ -35,9 +35,11 @@ namespace RevitAddinAcademy_01
             // uidoc.Selection collects IList for some reason
             IList<Element> pickList = uidoc.Selection.PickElementsByRectangle("Select lines");
 
+
             // Lets try selecting only lines
             //ISelectionFilter lineFilter = new LineSelectionFilter();
             // OK nvm. Looks like I need to create a class to make that work. Not ready for that
+            // Would probably make it easier to deal with those circles though.
             List<CurveElement> lineList = new List<CurveElement>();
 
             // I would like to use the same method for all of these
@@ -50,7 +52,7 @@ namespace RevitAddinAcademy_01
             PipeType curPipeType = GetPipeTypeByName(doc, "Default");
             DuctType curDuctType = GetDuctTypeByName(doc, "Default");
 
-            int glaz = 0; int wall = 0; int pipe = 0; int duct = 0;
+            int glaz = 0; int wall = 0; int pipe = 0; int duct = 0; int oth = 0; int cir = 0;
 
             using (Transaction t = new Transaction(doc))
             {
@@ -59,7 +61,7 @@ namespace RevitAddinAcademy_01
                 foreach (Element e in pickList)
                 {
                     // is compares type, == compares value
-                    if (e is CurveElement)
+                    if (e is ModelLine)
                     {
                         // e is Element, need to refer to it as a Curve Element to do curve stuff
                         CurveElement line = (CurveElement)e;
@@ -74,8 +76,12 @@ namespace RevitAddinAcademy_01
 
                         // Get the geometry of the curve
                         Curve curLine = line.GeometryCurve;
+                        
+
+
                         XYZ startPoint = curLine.GetEndPoint(0);
                         XYZ endPoint = curLine.GetEndPoint(1);
+
 
                         //switch statement
                         // just does stuff, no need to collect and use if else
@@ -83,8 +89,8 @@ namespace RevitAddinAcademy_01
 
                         // CHALLENGE - Let's try making the stuff with switch statements
                         // QUESTION - can you put wildcard matches or starts with or regex stuff in switch cases?
-                        // QUESTION - can you count the number of cases?
-                        // ANSWER         Probably just add one to an int for each case
+                        // QUESTION - does the break in case stop the switch statement or does it keep evaluating
+                        // QUESTION - is switch slower than for loop if there are lots of elements
                         
                         switch (curGS.Name)
                         {
@@ -134,6 +140,7 @@ namespace RevitAddinAcademy_01
 
                             default:
                                 Debug.Print("Found something else");
+                                oth++;
                                 break;
 
                         }

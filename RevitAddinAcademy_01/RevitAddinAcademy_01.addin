@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Command">
-    <Text>Working Command</Text>
+    <Text>Hidden Message</Text>
     <Description>Some description for RevitAddinAcademy_01</Description>
     <Assembly>RevitAddinAcademy_01.dll</Assembly>
-    <FullClassName>RevitAddinAcademy_01.Command</FullClassName>
+    <FullClassName>RevitAddinAcademy_01.cmdMessage</FullClassName>
     <ClientId>8295318C-D026-4D19-ABA9-0638D40A6BC9</ClientId>
     <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>

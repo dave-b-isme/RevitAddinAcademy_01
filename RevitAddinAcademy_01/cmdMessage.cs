@@ -17,7 +17,7 @@ using Autodesk.Revit.DB.Architecture;
 namespace RevitAddinAcademy_01
 {
     [Transaction(TransactionMode.Manual)]
-    public class Command : IExternalCommand
+    public class cmdMessage : IExternalCommand
     {
         public Result Execute(
           ExternalCommandData commandData,

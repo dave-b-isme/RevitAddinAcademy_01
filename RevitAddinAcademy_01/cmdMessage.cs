@@ -36,7 +36,7 @@ namespace RevitAddinAcademy_01
             List<CurveElement> curveList = new List<CurveElement>();
 
             WallType curWallType = GetWallTypeByName(doc, @"Generic - 8""");
-            LevelType curLevel = GetLevelTypeByName(doc, "Level 1");
+            Level curLevel = GetLevelByName(doc, "Level 1");
 
             MEPSystemType curSystemType = GetSystemTypeByName(doc, "Domestic Hot Water");
             PipeType curPipeType = GetPipeTypeByName(doc, "Default");
@@ -44,6 +44,8 @@ namespace RevitAddinAcademy_01
 
             using (Transaction t = new Transaction(doc))
             {
+                t.Start("Make Stuff");
+
                 foreach (Element e in pickList)
                 {
                     // is compares type, == compares value
@@ -79,13 +81,7 @@ namespace RevitAddinAcademy_01
                                 break;
 
                             case "<Wide Lines":
-                                Pipe newPipe = Pipe.Create(
-                                    doc,
-                                    curSystemType.Id,
-                                    curPipeType.Id,
-                                    curLevel.Id,
-                                    startPoint,
-                                    endPoint);
+                                Debug.Print("found a wide line");
                                 break;
 
                             default:
@@ -141,17 +137,17 @@ namespace RevitAddinAcademy_01
             return null;
         }
 
-        private LevelType GetLevelTypeByName(Document doc, string levelName)
+        private Level GetLevelByName(Document doc, string levelName)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc);
-            collector.OfClass(typeof(LevelType));
+            collector.OfClass(typeof(Level));
 
             foreach (Element curElem in collector)
             {
-                LevelType levelType = curElem as LevelType;
+                Level level = curElem as Level;
 
-                if (levelType.Name == levelName)
-                    return levelType;
+                if (level.Name == levelName)
+                    return level;
 
             }
             return null;

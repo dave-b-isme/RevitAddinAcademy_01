@@ -52,7 +52,7 @@ namespace RevitAddinAcademy_01
             PipeType curPipeType = GetPipeTypeByName(doc, "Default");
             DuctType curDuctType = GetDuctTypeByName(doc, "Default");
 
-            int glaz = 0; int wall = 0; int pipe = 0; int duct = 0; int oth = 0; int cir = 0;
+            int glaz = 0; int wall = 0; int pipe = 0; int duct = 0; int oth = 0;
             int curcles = 0;
 
             // Count the curvy curves

@@ -53,6 +53,10 @@ namespace RevitAddinAcademy_01
             DuctType curDuctType = GetDuctTypeByName(doc, "Default");
 
             int glaz = 0; int wall = 0; int pipe = 0; int duct = 0; int oth = 0; int cir = 0;
+            int curcles = 0;
+
+            // Count the curvy curves
+
 
             using (Transaction t = new Transaction(doc))
             {
@@ -63,6 +67,8 @@ namespace RevitAddinAcademy_01
                     // is compares type, == compares value
                     if (e is ModelLine)
                     {
+                        // Feels like cheating to ignore all the curves that are actual curves though
+                        
                         // e is Element, need to refer to it as a Curve Element to do curve stuff
                         CurveElement line = (CurveElement)e;
                         //same thing as
@@ -144,9 +150,16 @@ namespace RevitAddinAcademy_01
                                 break;
 
                         }
-
+                        
                         Debug.Print(curGS.Name);
                     }
+
+                    else
+                    {
+                        if (e is CurveElement)
+                            curcles++;
+                    }
+                    
 
                 }
                 t.Commit();
@@ -162,6 +175,7 @@ namespace RevitAddinAcademy_01
                 duct.ToString() + " Ducts" + "\r\n" +
                 pipe.ToString() + " Pipes" + "\r\n"
                 );
+            TaskDialog.Show("Complete", "I also found " + curcles.ToString() + " circles some trickster left in there" +"\r\n");
 
             return Result.Succeeded;
 

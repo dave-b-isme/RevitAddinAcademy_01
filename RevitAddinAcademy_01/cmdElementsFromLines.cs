@@ -54,8 +54,8 @@ namespace RevitAddinAcademy_01
 
             int glaz = 0; int wall = 0; int pipe = 0; int duct = 0; int oth = 0;
             int curcles = 0;
-
-            // Count the curvy curves
+            int cirCatch = 0;
+            int count = 0; int curveCount = 0;
 
 
             using (Transaction t = new Transaction(doc))
@@ -67,8 +67,7 @@ namespace RevitAddinAcademy_01
                     // is compares type, == compares value
                     if (e is ModelLine)
                     {
-                        // Feels like cheating to ignore all the curves that are actual curves though
-                        
+
                         // e is Element, need to refer to it as a Curve Element to do curve stuff
                         CurveElement line = (CurveElement)e;
                         //same thing as
@@ -81,12 +80,25 @@ namespace RevitAddinAcademy_01
                         GraphicsStyle curGS = line.LineStyle as GraphicsStyle;
 
                         // Get the geometry of the curve
+                        // Curve is different from CurveElement, not in Database just any generic curve
                         Curve curLine = line.GeometryCurve;
-                        
+
+                        XYZ startPoint = new XYZ(0, 0, 0);
+                        XYZ endPoint = new XYZ(0, 0, 0);
 
 
-                        XYZ startPoint = curLine.GetEndPoint(0);
-                        XYZ endPoint = curLine.GetEndPoint(1);
+                        //try
+                        //{
+                        //    startPoint = curLine.GetEndPoint(0);
+                        //    endPoint = curLine.GetEndPoint(1);
+                        //}
+                        //catch (Exception ep)
+                        //{
+                        //    Debug.WriteLine(ep.ToString());
+                        //    cirCatch++;
+                        //    break;
+
+                        //}
 
 
                         //switch statement
@@ -97,7 +109,9 @@ namespace RevitAddinAcademy_01
                         // QUESTION - can you put wildcard matches or starts with or regex stuff in switch cases?
                         // QUESTION - does the break in case stop the switch statement or does it keep evaluating
                         // QUESTION - is switch slower than for loop if there are lots of elements
-                        
+
+
+
                         switch (curGS.Name)
                         {
                             case "A-GLAZ":
@@ -154,12 +168,14 @@ namespace RevitAddinAcademy_01
                         Debug.Print(curGS.Name);
                     }
 
-                    else
-                    {
-                        if (e is CurveElement)
-                            curcles++;
-                    }
-                    
+                    if (e is ModelArc)
+                        curcles++;
+
+                    if (e is ModelLine)
+                        count++;
+
+                    if (e is CurveElement)
+                        curveCount++;
 
                 }
                 t.Commit();
@@ -167,23 +183,36 @@ namespace RevitAddinAcademy_01
             }
 
 
-            Debug.Print(glaz.ToString());
+            Debug.Print(oth.ToString());
 
-            TaskDialog.Show("Complete", "I converted "+ lineList.Count.ToString() + " Lines" + "\r\n" +
+            TaskDialog.Show("Complete", "I found "+ lineList.Count.ToString() + " Lines" + "\r\n" +
+                "\r\n" +
+                "I converted: " + "\r\n" +
                 wall.ToString() + " Walls" + "\r\n" +
                 glaz.ToString() + " Storefronts" + "\r\n" +
                 duct.ToString() + " Ducts" + "\r\n" +
-                pipe.ToString() + " Pipes" + "\r\n"
+                pipe.ToString() + " Pipes" + "\r\n" +
+                "\r\n" +
+                "And I found " + oth.ToString() + "other lines"
                 );
-            TaskDialog.Show("Complete", "I also found " + curcles.ToString() + " circles some trickster left in there" +"\r\n");
+            TaskDialog.Show("Complete", "I also found " + curcles.ToString() + " circles some trickster left in there");
+            TaskDialog.Show("Complete",
+                "Counter inside catch: " + cirCatch.ToString() +"\r\n" +
+                "e is ModelLine: " + count.ToString() + "\r\n" +
+                "e is ModelArc: " + curcles.ToString() + "\r\n" +
+                "e is CurveElement" + curveCount++
+                );
 
             return Result.Succeeded;
 
         }
 
+
         //// QUESTION Is it possible to add the class as an input and use one method to get any kind of type?
-        ////
+        ////        
         //private Type? GetTypeByName(Document doc, Type? famType, string typeName)
+        //
+        //private Element GetTypeByName(Document doc, Element type string typeName)
         //{
         //    FilteredElementCollector collector = new FilteredElementCollector(doc);
         //    collector.OfClass();

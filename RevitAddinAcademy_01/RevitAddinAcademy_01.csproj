@@ -54,13 +54,22 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="cmdProjectSetup.cs" />
+    <Compile Include="cmdWallsFromLines.cs" />
+    <Compile Include="frmWallsFromLines.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmWallsFromLines.Designer.cs">
+      <DependentUpon>frmWallsFromLines.cs</DependentUpon>
+    </Compile>
     <Compile Include="Template_App.cs" />
-    <Compile Include="cmdMessage.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Template_Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -96,6 +105,11 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmWallsFromLines.resx">
+      <DependentUpon>frmWallsFromLines.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -54,6 +54,7 @@ namespace RevitAddinAcademy_01
 
             int glaz = 0; int wall = 0; int pipe = 0; int duct = 0; int oth = 0;
             int curcles = 0;
+            int counter = 0; int lineCount = 0; int arcCount = 0;
 
             // Count the curvy curves
 
@@ -65,10 +66,8 @@ namespace RevitAddinAcademy_01
                 foreach (Element e in pickList)
                 {
                     // is compares type, == compares value
-                    if (e is ModelLine)
+                    if (e is CurveElement)
                     {
-                        // Feels like cheating to ignore all the curves that are actual curves though
-                        
                         // e is Element, need to refer to it as a Curve Element to do curve stuff
                         CurveElement line = (CurveElement)e;
                         //same thing as
@@ -82,11 +81,19 @@ namespace RevitAddinAcademy_01
 
                         // Get the geometry of the curve
                         Curve curLine = line.GeometryCurve;
+                        XYZ startPoint = new XYZ(0, 0, 0);
+                        XYZ endPoint = new XYZ(0, 0, 0);
                         
-
-
-                        XYZ startPoint = curLine.GetEndPoint(0);
-                        XYZ endPoint = curLine.GetEndPoint(1);
+                        try
+                        {
+                            startPoint = curLine.GetEndPoint(0);
+                            endPoint = curLine.GetEndPoint(1);
+                        }
+                        catch (Exception ep)
+                        {
+                            Debug.WriteLine(ep.ToString());
+                            curcles++;                             
+                        }
 
 
                         //switch statement
@@ -95,9 +102,9 @@ namespace RevitAddinAcademy_01
 
                         // CHALLENGE - Let's try making the stuff with switch statements
                         // QUESTION - can you put wildcard matches or starts with or regex stuff in switch cases?
-                        // QUESTION - does the break in case stop the switch statement or does it keep evaluating
-                        // QUESTION - is switch slower than for loop if there are lots of elements
-                        
+                        // QUESTION - does the break in case stop the switch statement or does it keep evaluating other cases?
+                        //      Perhaps one of these does it: You need to break;, throw, goto, or return from each of your case labels. In a loop you may also continue.
+
                         switch (curGS.Name)
                         {
                             case "A-GLAZ":
@@ -154,12 +161,12 @@ namespace RevitAddinAcademy_01
                         Debug.Print(curGS.Name);
                     }
 
-                    else
-                    {
-                        if (e is CurveElement)
-                            curcles++;
-                    }
-                    
+                    if (e is CurveElement)
+                        counter++;
+                    if (e is ModelLine)
+                        lineCount++;
+                    if (e is ModelArc)
+                        arcCount++;
 
                 }
                 t.Commit();
@@ -169,13 +176,23 @@ namespace RevitAddinAcademy_01
 
             Debug.Print(glaz.ToString());
 
-            TaskDialog.Show("Complete", "I converted "+ lineList.Count.ToString() + " Lines" + "\r\n" +
+            TaskDialog.Show("Complete", "I found "+ lineList.Count.ToString() + " Lines" + "\r\n" +
+                "\r\n" +
+                "I converted: " + "\r\n" +
                 wall.ToString() + " Walls" + "\r\n" +
                 glaz.ToString() + " Storefronts" + "\r\n" +
                 duct.ToString() + " Ducts" + "\r\n" +
-                pipe.ToString() + " Pipes" + "\r\n"
+                pipe.ToString() + " Pipes" + "\r\n" +
+                "\r\n" +
+                "And I found " + oth.ToString() + " other lines" + "\r\n"
                 );
-            TaskDialog.Show("Complete", "I also found " + curcles.ToString() + " circles some trickster left in there" +"\r\n");
+
+            TaskDialog.Show("Complete", "I also found " + curcles.ToString() + " circles some trickster left in there" +"\r\n" +
+                "\r\n" +
+                "CurveElement Count: " + counter.ToString() + "\r\n" +
+                "ModelLine Count: " + lineCount.ToString() + "\r\n" +
+                "ModelArc Count: " + arcCount.ToString() + "\r\n"
+                );
 
             return Result.Succeeded;
 

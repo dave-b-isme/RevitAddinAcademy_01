@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 //using Forms = System.Windows.Forms;
 //using Excel = Microsoft.Office.Interop.Excel;
-//using Autodesk.Revit.DB.Architecture;
-//using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.DB.Structure;
 //using Autodesk.Revit.DB.Electrical;
 //using Autodesk.Revit.DB.Mechanical;
 //using Autodesk.Revit.DB.Plumbing;
@@ -32,34 +32,50 @@ namespace RevitAddinAcademy_01
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            TaskDialog.Show("Debug", "Hello There");
+            Employee emp1 = new Employee("Joe", 24, "blue,red,white");
+            Employee emp2 = new Employee("Mary", 26, "green,red,brown");
+            Employee emp3 = new Employee("Felix", 45, "gray,beige");
 
-            // Access current selection
+            List<Employee> empList = new List<Employee>();
+            empList.Add(emp1);
+            empList.Add(emp2);
+            empList.Add(emp3);
 
-            Selection sel = uidoc.Selection;
+            Employees allEmployee = new Employees(empList);
 
-            // Retrieve elements from database
+            Debug.Print("There are " + allEmployee.GetEmployeeCount().ToString() + " employees.");
 
-            FilteredElementCollector col
-              = new FilteredElementCollector(doc)
-                .WhereElementIsNotElementType()
-                .OfCategory(BuiltInCategory.INVALID)
-                .OfClass(typeof(Wall));
+            Debug.Print(Utilities.GetTextFromClass());
 
-            // Filtered element collector is iterable
+            List<SpatialElement> roomList = Utilities.GetAllRooms(doc);
 
-            foreach (Element e in col)
+            using(Transaction t = new Transaction(doc))
             {
-                Debug.Print(e.Name);
+                t.Start("Insert furniture");
+
+                FamilySymbol curFS = Utilities.GetFamilySymbolByName(doc, "Desk", @"60"" x 30""");
+                curFS.Activate();
+
+                foreach (SpatialElement curRoom in roomList)
+                {
+                    LocationPoint roomLocation = curRoom.Location as LocationPoint;
+                    XYZ roomPoint = roomLocation.Point;
+                    
+                    FamilyInstance curFI = doc.Create.NewFamilyInstance(roomPoint, curFS, StructuralType.NonStructural);
+
+                    double area = Utilities.GetParamValueAsDouble(curRoom, "Area");
+
+                    // Room sent as element, doesn't need to be cast as element bc Rooms are subcategory of Elements
+                    Utilities.SetParamValue(curRoom, "Comments", "This is a comment");
+
+
+                }
+                t.Commit();
             }
 
-            // Modify document within a transaction
+            
 
-            using (Transaction tx = new Transaction(doc))
-            {
-                tx.Start("Transaction Name");
-                tx.Commit();
-            }
+
 
             return Result.Succeeded;
         }

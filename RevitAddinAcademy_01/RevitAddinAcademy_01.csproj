@@ -69,6 +69,7 @@
     <Compile Include="frmWallsFromLines.Designer.cs">
       <DependentUpon>frmWallsFromLines.cs</DependentUpon>
     </Compile>
+    <Compile Include="myClass.cs" />
     <Compile Include="Template_App.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Template_Command.cs" />

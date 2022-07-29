@@ -1,23 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Command">
-    <Text>Command</Text>
-    <Description>Some description for RevitAddinAcademy_01</Description>
+    <Text>Move In</Text>
+    <Description>Insert Furniture in Rooms</Description>
     <Assembly>RevitAddinAcademy_01.dll</Assembly>
-    <FullClassName>RevitAddinAcademy_01.Command</FullClassName>
+    <FullClassName>RevitAddinAcademy_01.cmdMoveIn</FullClassName>
     <ClientId>8295318C-D026-4D19-ABA9-0638D40A6BC9</ClientId>
     <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
-  </AddIn>
-	<AddIn Type="Command">
-		<Text>Walls from Lines</Text>
-		<Description>Create Walls from Lines in a Plan View</Description>
-		<Assembly>RevitAddinAcademy_01.dll</Assembly>
-		<FullClassName>RevitAddinAcademy_01.cmdWallsFromLines</FullClassName>
-		<ClientId>A1B18E9A-7C2D-46A7-904A-4F73BF31F819</ClientId>
-		<VendorId>com.typepad.thebuildingcoder</VendorId>
-		<VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
-	</AddIn>
+  </AddIn>	
   <AddIn Type="Application">
     <Name>Application RevitAddinAcademy_01</Name>
     <Assembly>RevitAddinAcademy_01.dll</Assembly>

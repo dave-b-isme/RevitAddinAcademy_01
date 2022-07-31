@@ -71,26 +71,36 @@ namespace RevitAddinAcademy_01
 
             List<SpatialElement> roomList = Util.GetAllRooms(doc);
 
-            foreach (SpatialElement room in roomList)
-            {
-                string curSetID = Util.GetParameter(room, "Furniture Set");
-                FurnitureSet curSet = GetFurnSetByAlias(setList, curSetID);
 
-                foreach(string alias in curSet.FurnSet)
+            using (Transaction t1 = new Transaction(doc))
+            {
+                t1.Start("Move in");
+                
+                foreach (SpatialElement room in roomList)
                 {
-                    try
+                    string curSetID = Util.GetParameter(room, "Furniture Set");
+                    FurnitureSet curSet = GetFurnSetByAlias(setList, curSetID);
+
+                    if (curSet != null)
                     {
-                        CreateFIinRoom(doc, room as Room, GetFSbyAlias(doc, typeList, alias));
+                        foreach (string alias in curSet.FurnSet)
+                        {
+                            try
+                            {
+                                CreateFIinRoom(doc, room as Room, GetFSbyAlias(doc, typeList, alias));
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine(ex.Message);
+                            }
+
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                    }
+
                 }
+                t1.Commit();
             }
 
-
-            
 
             // Furniture Count
             //List<SpatialElement> roomList = Util.GetAllRooms(doc);

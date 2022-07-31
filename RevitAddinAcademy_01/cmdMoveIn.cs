@@ -132,6 +132,8 @@ namespace RevitAddinAcademy_01
             // Maybe add a vector so furniture is not stacked
             LocationPoint roomLocation = room.Location as LocationPoint;
             XYZ roomPoint = roomLocation.Point;
+            if (curFS != null)
+                curFS.Activate();
             FamilyInstance curFI = doc.Create.NewFamilyInstance(roomPoint, curFS, StructuralType.NonStructural);
 
         }

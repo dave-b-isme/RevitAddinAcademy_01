@@ -36,7 +36,7 @@ namespace RevitAddinAcademy_01
 
         private List<string> FormatSetList(string furnName)
         {
-            List<string> returnList = furnName.Split(',').ToList();
+            List<string> returnList = furnName.Replace(", ",",").Split(',').ToList();
             return returnList;
         }
     }

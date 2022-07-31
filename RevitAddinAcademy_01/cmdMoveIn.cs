@@ -5,10 +5,11 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Forms = System.Windows.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
+//using Forms = System.Windows.Forms;
+//using Excel = Microsoft.Office.Interop.Excel;
 using Autodesk.Revit.DB.Architecture;
 //using Autodesk.Revit.DB.Structure;
 //using Autodesk.Revit.DB.Electrical;
@@ -34,20 +35,46 @@ namespace RevitAddinAcademy_01
 
             TaskDialog.Show("Debug", "Hello There");
 
-            Forms.OpenFileDialog dialog = new Forms.OpenFileDialog();
-            //dialog.InitialDirectory = @"C:\Users\David\Documents";
-            dialog.InitialDirectory = @"%USERPROFILE%\Documents";
-            dialog.Multiselect = false;
-            dialog.Filter = "Excel Files | *.xls; *.xlsx; *.xlsm | All Files | *.*";
+            // Get Excel Data - Currently selecting one file twice for this
+            // Need to change the method to extract workbook instead of each worksheet
+            // Maybe (or maybe not) add an overload that gets the WS if name is there and WB if not
+            List<string[]> wsSets = Util.GetExcelWS("Furniture Sets");
+            wsSets.RemoveAt(0);
+            List<string[]> wsTypes = Util.GetExcelWS("Furniture types");
+            wsTypes.RemoveAt(0);
 
-            if (dialog.ShowDialog() != Forms.DialogResult.OK)
+            //Build Furniture List from sets
+            // I wonder if I can (or should) build the Furn List and Types directly in the Class?
+            List<FurnitureSet> setList = new List<FurnitureSet>();
+
+            foreach (string[] wsRow in wsSets)
             {
-                TaskDialog.Show("Error", "Please select an Excel file");
-                return Result.Failed;
+                //FurnitureSet curSet = new FurnitureSet(wsRow);
+                // Wouldn't let me plug wsRow directly into the FurnitureSet so I indexed
+                FurnitureSet curSet = new FurnitureSet(wsRow[0], wsRow[1],wsRow[2]);
+                setList.Add(curSet);
             }
 
-            string filePath = dialog.FileName;
+            FurnitureList furnList = new FurnitureList(setList);
 
+            //Build Furniture Types from FurnType
+            List<FurnitureType> typeList = new List<FurnitureType>();
+
+            foreach (string[] wsRow in wsTypes)
+            {
+                FurnitureType curType = new FurnitureType(wsRow[0], wsRow[1], wsRow[2]);
+                typeList.Add(curType);
+            }
+            FurnitureTypes furnTypes = new FurnitureTypes(typeList);
+            int typeCount = furnTypes.GetFurnitureCount();
+
+
+            // OK now what?
+
+
+
+
+            // Furniture Count
             List<SpatialElement> roomList = Util.GetAllRooms(doc);
 
             using (Transaction t2 = new Transaction(doc))
@@ -71,5 +98,6 @@ namespace RevitAddinAcademy_01
 
             return Result.Succeeded;
         }
+
     }
 }

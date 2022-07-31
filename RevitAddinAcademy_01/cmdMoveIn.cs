@@ -54,7 +54,7 @@ namespace RevitAddinAcademy_01
                 FurnitureSet curSet = new FurnitureSet(wsRow[0], wsRow[1],wsRow[2]);
                 setList.Add(curSet);
             }
-
+            // Ignore this bit.  Use setList to look up Furniture Sets
             FurnitureList furnList = new FurnitureList(setList);
 
             //Build Furniture Types from FurnType
@@ -65,37 +65,28 @@ namespace RevitAddinAcademy_01
                 FurnitureType curType = new FurnitureType(wsRow[0], wsRow[1], wsRow[2]);
                 typeList.Add(curType);
             }
+            // Ignore this bit.  Use typeList to look up FamSymbols
             FurnitureTypes furnTypes = new FurnitureTypes(typeList);
-            int typeCount = furnTypes.GetFurnitureCount();
+            
 
-
-
-
-
-            // OK now what?
             List<SpatialElement> roomList = Util.GetAllRooms(doc);
 
             foreach (SpatialElement room in roomList)
             {
-                // CreateFIinRoom Needs the types of furniture to insert
-                // Need curFS for each of the names in the FurnitureType.FamType
+                string curSetID = Util.GetParameter(room, "Furniture Set");
+                FurnitureSet curSet = GetFurnSetByAlias(setList, curSetID);
 
-                FurnitureType curFurnType = new FurnitureType(null);
-                curFurnType.Name = Util.GetParameter(room, "Furniture Set");
-
-
-                // if (furnType.Name = Util.GetParameter(room, "Furniture Set")
-
-
-
-
-
-                // Get the parametervalue "Furniture Set"
-                // Get the room XYZ
-                // Get the furnSet with Name = parameter
-                // Get the furnTypes with Name = furnSet.furnSet
-                // insert a bunch of furniture based on like twelve sets of data that all needs to be cross referenced
-
+                foreach(string alias in curSet.FurnSet)
+                {
+                    try
+                    {
+                        CreateFIinRoom(doc, room as Room, GetFSbyAlias(doc, typeList, alias));
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
             }
 
 
@@ -135,21 +126,51 @@ namespace RevitAddinAcademy_01
 
         }
 
-        private FurnitureType GetFurnTypeByName(FurnitureTypes furnList, string typeName)
+        private FamilySymbol GetFSbyAlias(Document doc, List<string[]> wsData, string alias)
         {
-            List<FurnitureType> furnTypes = furnList as List<FurnitureType>;
-            foreach (FurnitureType curType in furnList as List<FurnitureType>)
-            {
+            FilteredElementCollector coll = new FilteredElementCollector(doc)
+                .OfClass(typeof(Family));
+            FamilySymbol curFS = null;
 
+            foreach(string[] wsDataItem in wsData)
+            {
+                if (wsDataItem[0]==alias)
+                {
+                    curFS = Util.GetFamTypeByName(doc, wsDataItem[1], wsDataItem[2]);
+                    return curFS;
+                }
             }
 
-            foreach (FurnitureType curType in furnList)
-            {
-
-            }
             return null;
         }
+        private FamilySymbol GetFSbyAlias(Document doc, List<FurnitureType> wsData, string alias)
+        {
+            FilteredElementCollector coll = new FilteredElementCollector(doc)
+                .OfClass(typeof(Family));
+            FamilySymbol curFS = null;
 
+            foreach (FurnitureType furnType in wsData)
+            {
+                if (furnType.Name == alias)
+                {
+                    curFS = Util.GetFamTypeByName(doc, furnType.FamName, furnType.FamType);
+                    return curFS;
+                }
+                
+            }
+            return null;
+
+        }
+        private FurnitureSet GetFurnSetByAlias(List<FurnitureSet> sets, string id)
+        {
+            foreach (FurnitureSet set in sets)
+            {
+                if(set.SetName == id)
+                    return set;
+            }
+
+            return null;
+        }
 
 
     }

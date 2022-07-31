@@ -13,7 +13,7 @@ using Autodesk.Revit.DB.Architecture;
 //using Autodesk.Revit.DB.Structure;
 //using Autodesk.Revit.DB.Electrical;
 //using Autodesk.Revit.DB.Mechanical;
-//using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.DB.Plumbing;
 
 namespace RevitAddinAcademy_01
 {
@@ -65,6 +65,8 @@ namespace RevitAddinAcademy_01
         }
 
     }
+    
+    // Maybe these should be dictionaries, key can be first column, maybe build a dictionary from both spreadsheets
     public class FurnitureTypes
     {
         public List<FurnitureType> FurnTypes { get; set; }
@@ -78,6 +80,17 @@ namespace RevitAddinAcademy_01
         }
 
     }
+    public class Spreadsheet
+    {
+        public string Name { get; set; }
+        public List<string[]> Rows { get; set; }
+        public Spreadsheet(string wsName, List<string[]> wsRows)
+        {
+            Name = wsName;
+            Rows = wsRows;
+        }
+    }
+
 
     // UTILITIES
 
@@ -89,6 +102,56 @@ namespace RevitAddinAcademy_01
 
     public static class Util
     {
+        public static Element GetTypeByName(Document doc, string typeClass, string famName, string typeName)
+        {
+            FilteredElementCollector coll = new FilteredElementCollector(doc);
+
+            switch (typeClass)
+            {
+                case "Family":
+                    coll.OfClass(typeof(Family));
+                    Element curElem = GetFamTypeByName(doc, famName, typeName);
+                    return curElem;
+                default:
+                    return null;
+            }
+        }
+        public static Element GetTypeByName(Document doc, string typeClass, string typeName)
+        {
+            FilteredElementCollector coll = new FilteredElementCollector(doc);
+
+            switch (typeClass)
+            {
+                case "WallType":
+                    coll.OfClass(typeof(WallType));
+                    foreach (Element e in coll)
+                    {
+                        if (e.Name == typeName)
+                            return e;
+                    }
+                    break;
+                default:
+                    return null;
+            }
+            return null;
+        }
+
+        public static PipeType GetPipeTypeByName(Document doc, string typeName)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            collector.OfClass(typeof(PipeType));
+
+            foreach (Element curElem in collector)
+            {
+                //PipeType curType = curElem as PipeType;
+
+                if (curElem.Name == typeName)
+                    return curElem as PipeType;
+
+            }
+            return null;
+        }
+
         public static List<SpatialElement> GetAllRooms(Document doc)
         {
             FilteredElementCollector coll = new FilteredElementCollector(doc)
@@ -102,7 +165,6 @@ namespace RevitAddinAcademy_01
             }
             return roomList;
         }
-
         public static FamilySymbol GetFamTypeByName(Document doc, string famName, string typeName)
         {
             FilteredElementCollector coll = new FilteredElementCollector(doc)
@@ -125,7 +187,6 @@ namespace RevitAddinAcademy_01
             }
             return null;
         }
-
         public static string GetParameter(Element curElem, string paramName)
         {
             foreach (Parameter curParam in curElem.Parameters)
@@ -161,7 +222,6 @@ namespace RevitAddinAcademy_01
             }
         }
 
-        // Maybe I don't really want to break these up
 
         public static List<string[]> GetExcelWS(string wsName)
         {
@@ -206,7 +266,8 @@ namespace RevitAddinAcademy_01
         public static List<string[]> GetExcelWSdata(string filePath, string wsName)
         {
             Excel.Application excelApp = new Excel.Application();
-            Excel.Workbook excelWB = excelApp.Workbooks.Open(filePath);
+            Excel.Workbooks excelWBS = excelApp.Workbooks;
+            Excel.Workbook excelWB = excelWBS.Open(filePath);
             Excel.Worksheet excelWS = excelWB.Worksheets[wsName];
             Excel.Range excelRng = excelWS.UsedRange;
 
@@ -230,8 +291,8 @@ namespace RevitAddinAcademy_01
                 dataList.Add(dataArray);
 
             }
-
             excelWB.Close();
+            excelWBS.Close();
             excelApp.Quit();
 
             return dataList;
@@ -239,7 +300,8 @@ namespace RevitAddinAcademy_01
         public static List<string[]> GetExcelWSdata(string filePath, int wsIndex)
         {
             Excel.Application excelApp = new Excel.Application();
-            Excel.Workbook excelWB = excelApp.Workbooks.Open(filePath);
+            Excel.Workbooks excelWBS = excelApp.Workbooks;
+            Excel.Workbook excelWB = excelWBS.Open(filePath);
             Excel.Worksheet excelWS = excelWB.Worksheets[wsIndex];
             Excel.Range excelRng = excelWS.UsedRange;
 
@@ -263,18 +325,70 @@ namespace RevitAddinAcademy_01
                 dataList.Add(dataArray);
 
             }
-
             excelWB.Close();
+            excelWBS.Close();
             excelApp.Quit();
 
             return dataList;
         }
 
-        public static List<string[]> GetExcelWBdata(string wsName)
+        public static List<Spreadsheet> GetExcelWS()
         {
-            // Can I get a whole Workbook?
-            // Maybe create a class ExcelWB that will take List<string[]>s?
-            throw new NotImplementedException();
+            // Maybe change to overload of GetExcelWS with no arguments
+            Forms.OpenFileDialog dialog = new Forms.OpenFileDialog();
+            dialog.InitialDirectory = @"%USERPROFILE%\Documents";
+            dialog.Multiselect = false;
+            dialog.Filter = "Excel Files | *.xls; *.xlsx; *.xlsm | All Files | *.*";
+
+            if (dialog.ShowDialog() != Forms.DialogResult.OK)
+            {
+                TaskDialog.Show("Error", "Please select an Excel file");
+                return null;
+            }
+            string filePath = dialog.FileName;
+
+            return GetExcelWBData(filePath);
+        }
+
+        public static List<Spreadsheet> GetExcelWBData(string filePath)
+        {
+            List<Spreadsheet> workBook = new List<Spreadsheet>();
+            
+            Excel.Application excelApp = new Excel.Application();
+            Excel.Workbooks excelWBS = excelApp.Workbooks;
+            Excel.Workbook excelWB = excelWBS.Open(filePath);
+
+            // might need to throw out blank workbooks - if excelRng.Rows.Count <1 or something
+            foreach (Excel.Worksheet ws in excelWB.Worksheets)
+            {
+                Excel.Range excelRng = ws.UsedRange;
+                int colCount = excelRng.Columns.Count;
+                int rowCount = excelRng.Rows.Count;
+                
+                List<string[]> dataList = new List<string[]>();
+                
+
+                for (int r = 1; r <= rowCount; r++)
+                {
+                    string[] dataArray = new string[colCount];
+
+                    for (int c = 1; c <= colCount; c++)
+                    {
+                        Excel.Range cell = ws.Cells[r, c];
+                        dataArray[c - 1] = cell.Value.ToString();
+                    }
+                    dataList.Add(dataArray);
+                    
+                }
+                Spreadsheet curSS = new Spreadsheet(ws.Name, dataList);
+                workBook.Add(curSS);
+            }
+
+            excelWB.Close();
+            excelWBS.Close();
+            excelApp.Quit();
+
+            return workBook;
         }
 
         public static List<FamilyInstance> GetFurnInRoom(Document doc, Room curRoom)
@@ -300,8 +414,5 @@ namespace RevitAddinAcademy_01
             return furnList;
         }
 
-
     }
-
-
 }

@@ -34,14 +34,37 @@ namespace RevitAddinAcademy_01
             Document doc = uidoc.Document;
 
             TaskDialog.Show("Debug", "Hello There");
-
+            
             // Get Excel Data - Currently selecting one file twice for this
             // Need to change the method to extract workbook instead of each worksheet
             // Maybe (or maybe not) add an overload that gets the WS if name is there and WB if not
-            List<string[]> wsSets = Util.GetExcelWS("Furniture Sets");
-            wsSets.RemoveAt(0);
-            List<string[]> wsTypes = Util.GetExcelWS("Furniture types");
-            wsTypes.RemoveAt(0);
+            //List<string[]> wsSets = Util.GetExcelWS("Furniture Sets");
+            //wsSets.RemoveAt(0);
+            //List<string[]> wsTypes = Util.GetExcelWS("Furniture types");
+            //wsTypes.RemoveAt(0);
+
+            // Get Excel Workbook
+            List<Spreadsheet> wsBook = Util.GetExcelWS();
+            List<string[]> wsSets = new List<string[]>(); List<string[]> wsTypes = new List<string[]>();
+            
+            foreach (Spreadsheet ws in wsBook)
+            {
+                switch (ws.Name)
+                {
+                    case "Furniture sets":
+                        wsSets = ws.Rows;
+                        break;
+                    case "Furniture types":
+                        wsTypes = ws.Rows;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            wsSets.RemoveAt(0); wsTypes.RemoveAt(0);
+
+
+
 
             //Build Furniture List from sets
             // I wonder if I can (or should) build the Furn List and Types directly in the Class?

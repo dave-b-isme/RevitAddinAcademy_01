@@ -70,6 +70,8 @@ namespace RevitAddinAcademy_01
 
 
 
+
+
             // OK now what?
             List<SpatialElement> roomList = Util.GetAllRooms(doc);
 
@@ -141,11 +143,14 @@ namespace RevitAddinAcademy_01
 
             }
 
-            foreach (FurnitureType curType in furnList as List<FurnitureType>)
+            foreach (FurnitureType curType in furnList)
             {
 
             }
             return null;
         }
+
+
+
     }
 }

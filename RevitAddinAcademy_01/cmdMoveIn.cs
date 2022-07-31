@@ -11,7 +11,7 @@ using System.Diagnostics;
 //using Forms = System.Windows.Forms;
 //using Excel = Microsoft.Office.Interop.Excel;
 using Autodesk.Revit.DB.Architecture;
-//using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.DB.Structure;
 //using Autodesk.Revit.DB.Electrical;
 //using Autodesk.Revit.DB.Mechanical;
 //using Autodesk.Revit.DB.Plumbing;
@@ -69,13 +69,38 @@ namespace RevitAddinAcademy_01
             int typeCount = furnTypes.GetFurnitureCount();
 
 
+
             // OK now what?
+            List<SpatialElement> roomList = Util.GetAllRooms(doc);
+
+            foreach (SpatialElement room in roomList)
+            {
+                // CreateFIinRoom Needs the types of furniture to insert
+                // Need curFS for each of the names in the FurnitureType.FamType
+
+                FurnitureType curFurnType = new FurnitureType(null);
+                curFurnType.Name = Util.GetParameter(room, "Furniture Set");
+
+
+                // if (furnType.Name = Util.GetParameter(room, "Furniture Set")
 
 
 
+
+
+                // Get the parametervalue "Furniture Set"
+                // Get the room XYZ
+                // Get the furnSet with Name = parameter
+                // Get the furnTypes with Name = furnSet.furnSet
+                // insert a bunch of furniture based on like twelve sets of data that all needs to be cross referenced
+
+            }
+
+
+            
 
             // Furniture Count
-            List<SpatialElement> roomList = Util.GetAllRooms(doc);
+            //List<SpatialElement> roomList = Util.GetAllRooms(doc);
 
             using (Transaction t2 = new Transaction(doc))
             {
@@ -99,5 +124,28 @@ namespace RevitAddinAcademy_01
             return Result.Succeeded;
         }
 
+        private void CreateFIinRoom(Document doc, Room room, FamilySymbol curFS)
+        {
+            // Maybe add a vector so furniture is not stacked
+            LocationPoint roomLocation = room.Location as LocationPoint;
+            XYZ roomPoint = roomLocation.Point;
+            FamilyInstance curFI = doc.Create.NewFamilyInstance(roomPoint, curFS, StructuralType.NonStructural);
+
+        }
+
+        private FurnitureType GetFurnTypeByName(FurnitureTypes furnList, string typeName)
+        {
+            List<FurnitureType> furnTypes = furnList as List<FurnitureType>;
+            foreach (FurnitureType curType in furnList as List<FurnitureType>)
+            {
+
+            }
+
+            foreach (FurnitureType curType in furnList as List<FurnitureType>)
+            {
+
+            }
+            return null;
+        }
     }
 }

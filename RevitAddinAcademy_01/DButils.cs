@@ -17,10 +17,6 @@ using Autodesk.Revit.DB.Plumbing;
 
 namespace RevitAddinAcademy_01
 {
-    internal class DButils
-    {
-    }
-
     public class FurnitureSet
     {
         public string SetName { get; set; }
@@ -56,12 +52,20 @@ namespace RevitAddinAcademy_01
         public string Name { get; set; }
         public string FamName { get; set; }
         public string FamType { get; set; }
+        // Get Family Symbol (Type) in the Class
+        // Only loop through data once in the class, not every loop in the command
+        public Document Doc { get; set; }
+        public FamilySymbol FamSymbol { get; set; }
 
-        public FurnitureType(string name, string famName, string famType)
+        //public FurnitureType(Document doc, string name, string famName, string famType)
+        public FurnitureType(Document doc, string name, string famName, string famType)
         {
+            Doc = doc;
             Name = name;
             FamName = famName;
             FamType = famType;
+            FamSymbol = Util.GetFamTypeByName(doc, famName, famType);
+            // Arguments not needed?
         }
 
     }
@@ -155,15 +159,16 @@ namespace RevitAddinAcademy_01
         public static List<SpatialElement> GetAllRooms(Document doc)
         {
             FilteredElementCollector coll = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_Rooms);
-            List<SpatialElement> roomList = new List<SpatialElement>();
+                .OfCategory(BuiltInCategory.OST_Rooms)
+                .WhereElementIsNotElementType();
+            List<SpatialElement> returnList = new List<SpatialElement>();
 
             foreach (Element curElem in coll)
             {
                 SpatialElement curRoom = curElem as SpatialElement;
-                roomList.Add(curRoom);
+                returnList.Add(curRoom);
             }
-            return roomList;
+            return returnList;
         }
         public static FamilySymbol GetFamTypeByName(Document doc, string famName, string typeName)
         {

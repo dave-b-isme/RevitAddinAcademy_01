@@ -30,7 +30,7 @@ namespace RevitAddinAcademy_01
         {
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
-            Application app = uiapp.Application;
+            //Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
             TaskDialog.Show("Debug", "Hello There");
@@ -67,34 +67,30 @@ namespace RevitAddinAcademy_01
 
 
             //Build Furniture List from sets
-            // I wonder if I can (or should) build the Furn List and Types directly in the Class?
             List<FurnitureSet> setList = new List<FurnitureSet>();
 
             foreach (string[] wsRow in wsSets)
             {
                 //FurnitureSet curSet = new FurnitureSet(wsRow);
                 // Wouldn't let me plug wsRow directly into the FurnitureSet so I indexed
+                // Consider wsRow[i].Trim to clean up data
                 FurnitureSet curSet = new FurnitureSet(wsRow[0], wsRow[1],wsRow[2]);
                 setList.Add(curSet);
             }
             // Ignore this bit.  Use setList to look up Furniture Sets
-            FurnitureList furnList = new FurnitureList(setList);
+            //FurnitureList furnList = new FurnitureList(setList);
 
             //Build Furniture Types from FurnType
             List<FurnitureType> typeList = new List<FurnitureType>();
 
             foreach (string[] wsRow in wsTypes)
             {
-                FurnitureType curType = new FurnitureType(wsRow[0], wsRow[1], wsRow[2]);
+                FurnitureType curType = new FurnitureType(doc, wsRow[0], wsRow[1], wsRow[2]);
                 typeList.Add(curType);
             }
-            // Ignore this bit.  Use typeList to look up FamSymbols
-            FurnitureTypes furnTypes = new FurnitureTypes(typeList);
-            
 
             List<SpatialElement> roomList = Util.GetAllRooms(doc);
-
-
+            
             using (Transaction t1 = new Transaction(doc))
             {
                 t1.Start("Move in");
@@ -103,14 +99,14 @@ namespace RevitAddinAcademy_01
                 {
                     string curSetID = Util.GetParameter(room, "Furniture Set");
                     FurnitureSet curSet = GetFurnSetByAlias(setList, curSetID);
-
+                    
                     if (curSet != null)
                     {
                         foreach (string alias in curSet.FurnSet)
                         {
                             try
                             {
-                                CreateFIinRoom(doc, room as Room, GetFSbyAlias(doc, typeList, alias));
+                                CreateFIinRoom(doc, room as Room, GetFSbyAlias(typeList, alias));
                             }
                             catch (Exception ex)
                             {
@@ -144,58 +140,42 @@ namespace RevitAddinAcademy_01
 
                 t2.Commit();
             }
-
-
-
+            
             return Result.Succeeded;
         }
 
         private void CreateFIinRoom(Document doc, Room room, FamilySymbol curFS)
         {
-            // Maybe add a vector so furniture is not stacked
             LocationPoint roomLocation = room.Location as LocationPoint;
             XYZ roomPoint = roomLocation.Point;
+            // Maybe add an instanced vector to room point, create at insertPoint so furniture is not stacked
             if (curFS != null)
                 curFS.Activate();
-            FamilyInstance curFI = doc.Create.NewFamilyInstance(roomPoint, curFS, StructuralType.NonStructural);
+            doc.Create.NewFamilyInstance(roomPoint, curFS, StructuralType.NonStructural);
 
         }
 
-        private FamilySymbol GetFSbyAlias(Document doc, List<string[]> wsData, string alias)
+        private FamilySymbol GetFSbyAlias(List<FurnitureType> wsData, string alias)
         {
-            FilteredElementCollector coll = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family));
-            FamilySymbol curFS = null;
-
-            foreach(string[] wsDataItem in wsData)
-            {
-                if (wsDataItem[0]==alias)
-                {
-                    curFS = Util.GetFamTypeByName(doc, wsDataItem[1], wsDataItem[2]);
-                    return curFS;
-                }
-            }
-
-            return null;
-        }
-        private FamilySymbol GetFSbyAlias(Document doc, List<FurnitureType> wsData, string alias)
-        {
-            FilteredElementCollector coll = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family));
-            FamilySymbol curFS = null;
+            // Getting Family Symbol in Class means I can remove the collector from this method
+            //FilteredElementCollector coll = new FilteredElementCollector(doc)
+            //    .OfClass(typeof(Family));
+            //FamilySymbol curFS = null;
 
             foreach (FurnitureType furnType in wsData)
             {
                 if (furnType.Name == alias)
-                {
-                    curFS = Util.GetFamTypeByName(doc, furnType.FamName, furnType.FamType);
-                    return curFS;
-                }
-                
+                    return furnType.FamSymbol;
+                // And I can just return the matching FamSymbol
+                //{
+                //    //curFS = Util.GetFamTypeByName(doc, furnType.FamName, furnType.FamType);
+                //    return curFS;
+                //}
             }
-            return null;
 
+            return null;
         }
+
         private FurnitureSet GetFurnSetByAlias(List<FurnitureSet> sets, string id)
         {
             foreach (FurnitureSet set in sets)

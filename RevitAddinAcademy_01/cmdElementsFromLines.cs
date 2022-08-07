@@ -35,6 +35,9 @@ namespace RevitAddinAcademy_01
             // uidoc.Selection collects IList for some reason
             IList<Element> pickList = uidoc.Selection.PickElementsByRectangle("Select lines");
 
+            // QUESTION - can PickElements only pic specific types?
+            //
+
 
             // Lets try selecting only lines
             //ISelectionFilter lineFilter = new LineSelectionFilter();
@@ -80,10 +83,23 @@ namespace RevitAddinAcademy_01
                         GraphicsStyle curGS = line.LineStyle as GraphicsStyle;
 
                         // Get the geometry of the curve
+                        // Give it a legit curve (diff start & end point) in case nothing was found
+                        //
                         Curve curLine = line.GeometryCurve;
-                        XYZ startPoint = new XYZ(0, 0, 0);
-                        XYZ endPoint = new XYZ(0, 0, 0);
+
+
+                        XYZ startPoint;
+                        XYZ endPoint;
                         
+                        // Pipes & Ducts require start and end points (circles won't work)
+                        // Need to create arced walls with a different method that accounts for the arc,
+                        // this method would create straight wall from start to end 
+                        // Or maybe not, walls don't need end points to create, they are line based
+
+
+                        // can also put if statement in switch statement (sometimes?)
+                        //
+
                         try
                         {
                             startPoint = curLine.GetEndPoint(0);
@@ -92,7 +108,9 @@ namespace RevitAddinAcademy_01
                         catch (Exception ep)
                         {
                             Debug.WriteLine(ep.ToString());
-                            curcles++;                             
+                            startPoint = null;
+                            endPoint = null;
+                            curcles++;
                         }
 
 
@@ -217,6 +235,7 @@ namespace RevitAddinAcademy_01
         //    return null;
         //}
 
+
         private WallType GetWallTypeByName(Document doc, string wallTypeName)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -224,6 +243,7 @@ namespace RevitAddinAcademy_01
 
             foreach (Element curElem in collector)
             {
+                // This is called "casting" - casting the Element as a Wall Type
                 WallType wallType = curElem as WallType;
 
                 if (wallType.Name == wallTypeName)

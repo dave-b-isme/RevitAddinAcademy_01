@@ -149,6 +149,7 @@ namespace RevitAddinAcademy_01
             LocationPoint roomLocation = room.Location as LocationPoint;
             XYZ roomPoint = roomLocation.Point;
             // Maybe add an instanced vector to room point, create at insertPoint so furniture is not stacked
+            // Activate and Create need to be inside transaction
             if (curFS != null)
                 curFS.Activate();
             doc.Create.NewFamilyInstance(roomPoint, curFS, StructuralType.NonStructural);

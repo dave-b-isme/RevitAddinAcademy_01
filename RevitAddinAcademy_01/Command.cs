@@ -21,7 +21,7 @@ using System.Diagnostics;
 namespace RevitAddinAcademy_01
 {
     [Transaction(TransactionMode.Manual)]
-    public class Template_Command : IExternalCommand
+    public class Command : IExternalCommand
     {
         public Result Execute(
           ExternalCommandData commandData,

@@ -62,8 +62,8 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="DButils.cs" />
-    <Compile Include="cmdProjectSetup.cs" />
-    <Compile Include="cmdWallsFromLines.cs" />
+    <Compile Include="CmdProjectSetup.cs" />
+    <Compile Include="CmdWallsFromLines.cs" />
     <Compile Include="frmWallsFromLines.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -71,7 +71,9 @@
       <DependentUpon>frmWallsFromLines.cs</DependentUpon>
     </Compile>
     <Compile Include="Template_App.cs" />
-    <Compile Include="cmdMoveIn.cs" />
+    <Compile Include="CmdMoveIn.cs" />
+    <Compile Include="CmdLoadGroups.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="Template_Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

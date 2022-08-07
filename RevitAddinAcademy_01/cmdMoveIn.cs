@@ -21,7 +21,7 @@ using Autodesk.Revit.DB.Structure;
 namespace RevitAddinAcademy_01
 {
     [Transaction(TransactionMode.Manual)]
-    public class cmdMoveIn : IExternalCommand
+    public class CmdMoveIn : IExternalCommand
     {
         public Result Execute(
           ExternalCommandData commandData,

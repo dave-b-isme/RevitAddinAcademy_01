@@ -15,7 +15,7 @@ using System.Diagnostics;
 namespace RevitAddinAcademy_01
 {
     [Transaction(TransactionMode.Manual)]
-    public class cmdWallsFromLines : IExternalCommand
+    public class CmdWallsFromLines : IExternalCommand
     {
         public Result Execute(
           ExternalCommandData commandData,

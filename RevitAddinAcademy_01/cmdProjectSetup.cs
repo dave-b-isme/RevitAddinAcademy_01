@@ -15,7 +15,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 namespace RevitAddinAcademy_01
 {
     [Transaction(TransactionMode.Manual)]
-    public class cmdProjectSetup : IExternalCommand
+    public class CmdProjectSetup : IExternalCommand
     {
         public Result Execute(
           ExternalCommandData commandData,

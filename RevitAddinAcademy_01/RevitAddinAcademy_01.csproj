@@ -45,6 +45,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="RevitAPI">
       <HintPath>$(ProgramW6432)\Autodesk\Revit 2022\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -58,6 +60,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
@@ -70,6 +73,11 @@
     <Compile Include="frmWallsFromLines.Designer.cs">
       <DependentUpon>frmWallsFromLines.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Template_App.cs" />
     <Compile Include="CmdMoveIn.cs" />
     <Compile Include="CmdLoadGroups.cs" />
@@ -78,6 +86,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Blue_16.png" />
+    <EmbeddedResource Include="Resources\Blue_32.png" />
+    <EmbeddedResource Include="Resources\Green_16.png" />
+    <EmbeddedResource Include="Resources\Green_32.png" />
+    <EmbeddedResource Include="Resources\Red_16.png" />
+    <EmbeddedResource Include="Resources\Red_32.png" />
+    <EmbeddedResource Include="Resources\Yellow_16.png" />
+    <EmbeddedResource Include="Resources\Yellow_32.png" />
     <Content Include="RevitAddinAcademy_01.addin" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +128,10 @@
   <ItemGroup>
     <EmbeddedResource Include="frmWallsFromLines.resx">
       <DependentUpon>frmWallsFromLines.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

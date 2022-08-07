@@ -1,20 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
-  <AddIn Type="Command">
-    <Text>Command</Text>
-    <Description>Command Description</Description>
-    <Assembly>RevitAddinAcademy_01.dll</Assembly>
-    <FullClassName>RevitAddinAcademy_01.Command</FullClassName>
-    <ClientId>8295318C-D026-4D19-ABA9-0638D40A6BC9</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
-  </AddIn>	
-  <AddIn Type="Application">
-    <Name>Application RevitAddinAcademy_01</Name>
-    <Assembly>RevitAddinAcademy_01.dll</Assembly>
-    <FullClassName>RevitAddinAcademy_01.App</FullClassName>
-    <ClientId>5EBC9113-38D4-4F84-84AC-E59FDD2382E6</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
-  </AddIn>
+    <AddIn Type="Application">
+        <Name>Application RevitAddinAcademy_01</Name>
+        <Assembly>RevitAddinAcademy_01.dll</Assembly>
+        <FullClassName>RevitAddinAcademy_01.App</FullClassName>
+        <ClientId>5EBC9113-38D4-4F84-84AC-E59FDD2382E6</ClientId>
+        <VendorId>com.typepad.thebuildingcoder</VendorId>
+        <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+    </AddIn>
 </RevitAddIns>

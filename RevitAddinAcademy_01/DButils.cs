@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Media.Imaging;
+using System.IO;
 using Forms = System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using Autodesk.Revit.DB.Architecture;
@@ -14,9 +16,53 @@ using Autodesk.Revit.DB.Architecture;
 //using Autodesk.Revit.DB.Electrical;
 //using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
+using System.Drawing;
+using System.Reflection;
 
 namespace RevitAddinAcademy_01
 {
+    public class ButtonData
+    {
+        public string Name { get; set; }
+        public string Text { get; set; }
+        public BitmapImage Icon { get; set; }
+        public BitmapImage LargeIcon { get; set; }
+        public string Command { get; set; }
+        public string ToolTip { get; set; }
+
+        public ButtonData(string name, string text, Bitmap icon, Bitmap largeIcon, string command, string toolTip)
+        {
+            Name = name;
+            Text = text;
+            Icon = BitmapToImageSource(icon);
+            LargeIcon = BitmapToImageSource(largeIcon);
+            Command = ReferenceCmdByName(command);
+            ToolTip = toolTip;
+        }
+
+        private string ReferenceCmdByName(string command)
+        {
+            string cmdName = GetType().Namespace + "." + command;
+            return cmdName;
+        }
+
+        private BitmapImage BitmapToImageSource(Bitmap icon)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                icon.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                ms.Position = 0;
+                BitmapImage bmi = new BitmapImage();
+                bmi.BeginInit();
+                bmi.StreamSource = ms;
+                bmi.CacheOption = BitmapCacheOption.OnLoad;
+                bmi.EndInit();
+
+                return bmi;
+            }
+        }
+    }
+
     public class FurnitureSet
     {
         public string SetName { get; set; }
@@ -102,6 +148,7 @@ namespace RevitAddinAcademy_01
     // switch statement with case string = walltype to get WallType as element etc.
     // WallType is ElementType so maybe send that instead of string?
 
+    // Note for later:
     // return (workset != null) ? workset : worksets.FirstOrDefault();
 
     public static class Util
